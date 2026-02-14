@@ -11,7 +11,37 @@ import SwiftUI
 struct JsonTestApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView()
+        }
+    }
+}
+
+import SwiftUI
+
+// MARK: - Главная страница выбора
+struct HomeView: View {
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                Text("Выберите экран")
+                    .font(.largeTitle)
+                    .bold()
+                
+                NavigationLink("Рандомные имена") {
+                    RandomUsersView()
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.blue)
+                
+                NavigationLink("Rick & Morty") {
+                    RickAndMortyView()
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(.green)
+                
+                Spacer()
+            }
+            .padding()
         }
     }
 }
