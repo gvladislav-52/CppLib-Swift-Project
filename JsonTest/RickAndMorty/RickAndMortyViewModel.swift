@@ -34,36 +34,7 @@ final class RickAndMortyViewModel: ObservableObject {
     
     func parse(data: Data) throws -> [RickAndMortyModel] {
         
-        guard
-            let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-            let results = json[JSONKeys.RickAndMortyKeys.results] as? [[String: Any]]
-        else {
-            throw AppError.parsing
-        }
-        
-        var simpleArray: [[String: Any]] = []
-        
-        for item in results {
-            guard
-                let id = item[JSONKeys.RickAndMortyKeys.id] as? Int,
-                let name = item[JSONKeys.RickAndMortyKeys.name] as? String,
-                let species = item[JSONKeys.RickAndMortyKeys.species] as? String,
-                let status = item[JSONKeys.RickAndMortyKeys.status] as? String,
-                let imageURL = item[JSONKeys.RickAndMortyKeys.image] as? String
-            else { continue }
-            
-            simpleArray.append([
-                JSONKeys.RickAndMortyKeys.id: id,
-                JSONKeys.RickAndMortyKeys.name: name,
-                JSONKeys.RickAndMortyKeys.species: species,
-                JSONKeys.RickAndMortyKeys.status: status,
-                JSONKeys.RickAndMortyKeys.imageURL: imageURL
-            ])
-        }
-        
-        let simpleData = try JSONSerialization.data(withJSONObject: simpleArray)
-        
-        guard let jsonString = String(data: simpleData, encoding: .utf8) else {
+        guard let jsonString = String(data: data, encoding: .utf8) else {
             throw AppError.parsing
         }
         
@@ -89,4 +60,5 @@ final class RickAndMortyViewModel: ObservableObject {
         
         return swiftCharacters
     }
+
 }

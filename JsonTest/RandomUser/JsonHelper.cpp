@@ -35,37 +35,51 @@ extern "C" {
 
     static CPersonArrayHolder g_holder;
 
-    CPersonArray parse_people_from_json(const char* json) {
-        g_holder.people_storage.clear();
-        g_holder.allocated_names.clear();
+CPersonArray parse_people_from_json(const char* json) {
+    g_holder.people_storage.clear();
+    g_holder.allocated_names.clear();
 
-        CPersonArray result{};
-    
-        try {
-            auto v = tao::json::from_string(json);
+    CPersonArray result{};
 
-            for (const auto& item : v.get_array()) {
-                std::string name = item.at("name").as<std::string>();
-                int age = item.at("age").as<int>();
+    try {
+        auto v = tao::json::from_string(json);
 
-                char* name_c = new char[name.size() + 1];
-                std::strcpy(name_c, name.c_str());
-                g_holder.allocated_names.push_back(name_c);
+        const auto& results = v.at("results").get_array();
 
-                CPerson cPerson;
-                cPerson.name = name_c;
-                cPerson.age = age;
-                g_holder.people_storage.push_back(cPerson);
-            }
+        for (const auto& user : results) {
+            const auto& nameObj = user.at("name");
+            std::string first = nameObj.at("first").as<std::string>();
+            std::string last  = nameObj.at("last").as<std::string>();
+            std::string fullName = first + " " + last;
 
-            result.people = g_holder.people_storage.data();
-            result.count = static_cast<int>(g_holder.people_storage.size());
-            return result;
+            const auto& dobObj = user.at("dob");
+            int age = dobObj.at("age").as<int>();
+
+            char* name_c = new char[fullName.size() + 1];
+            std::strcpy(name_c, fullName.c_str());
+            g_holder.allocated_names.push_back(name_c);
+
+            CPerson cPerson;
+            cPerson.name = name_c;
+            cPerson.age = age;
+            g_holder.people_storage.push_back(cPerson);
         }
-        catch (const tao::pegtl::parse_error& e) {
-            result.people = nullptr;
-            result.count = 0;
-            return result;
-        }
+
+        result.people = g_holder.people_storage.data();
+        result.count = static_cast<int>(g_holder.people_storage.size());
+        return result;
     }
+    catch (const tao::pegtl::parse_error& e) {
+        result.people = nullptr;
+        result.count = 0;
+        return result;
+    }
+    catch (const std::exception& e) {
+        result.people = nullptr;
+        result.count = 0;
+        return result;
+    }
+}
+
+
 }

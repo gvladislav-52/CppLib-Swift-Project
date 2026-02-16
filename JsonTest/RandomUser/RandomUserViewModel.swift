@@ -33,34 +33,7 @@ final class RandomUsersViewModel: ObservableObject {
     }
     
     private func parse(data: Data) throws -> [RandomUserModel] {
-        
-        guard
-            let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-            let results = json[JSONKeys.RandomUserKeys.results] as? [[String: Any]]
-        else {
-            throw AppError.parsing
-        }
-        
-        var simpleArray: [[String: Any]] = []
-        
-        for user in results {
-            guard
-                let nameDict = user[JSONKeys.RandomUserKeys.name] as? [String: Any],
-                let first = nameDict[JSONKeys.RandomUserKeys.first] as? String,
-                let last = nameDict[JSONKeys.RandomUserKeys.last] as? String,
-                let dob = user[JSONKeys.RandomUserKeys.dob] as? [String: Any],
-                let age = dob[JSONKeys.RandomUserKeys.age] as? Int
-            else { continue }
-            
-            simpleArray.append([
-                JSONKeys.RandomUserKeys.name: "\(first) \(last)",
-                JSONKeys.RandomUserKeys.age: age
-            ])
-        }
-        
-        let simpleData = try JSONSerialization.data(withJSONObject: simpleArray)
-        
-        guard let jsonString = String(data: simpleData, encoding: .utf8) else {
+        guard let jsonString = String(data: data, encoding: .utf8) else {
             throw AppError.parsing
         }
         
@@ -83,4 +56,5 @@ final class RandomUsersViewModel: ObservableObject {
         
         return swiftPeople
     }
+
 }
